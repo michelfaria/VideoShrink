@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AMApplicationBuild</key>
+	<string>512</string>
+	<key>AMApplicationVersion</key>
+	<string>2.10</string>
+	<key>AMDocumentVersion</key>
+	<string>2</string>
+	<key>actions</key>
+	<array>
+		<dict>
+			<key>action</key>
+			<dict>
+				<key>AMAccepts</key>
+				<dict>
+					<key>Container</key>
+					<string>List</string>
+					<key>Optional</key>
+					<true/>
+					<key>Types</key>
+					<array>
+						<string>com.apple.cocoa.string</string>
+					</array>
+				</dict>
+				<key>AMActionVersion</key>
+				<string>2.0.3</string>
+				<key>AMApplication</key>
+				<array>
+					<string>Automator</string>
+				</array>
+				<key>AMParameterProperties</key>
+				<dict>
+					<key>COMMAND_STRING</key>
+					<dict/>
+					<key>CheckedForUserDefaultShell</key>
+					<dict/>
+					<key>inputMethod</key>
+					<dict/>
+					<key>shell</key>
+					<dict/>
+					<key>source</key>
+					<dict/>
+				</dict>
+				<key>AMProvides</key>
+				<dict>
+					<key>Container</key>
+					<string>List</string>
+					<key>Types</key>
+					<array>
+						<string>com.apple.cocoa.string</string>
+					</array>
+				</dict>
+				<key>ActionBundlePath</key>
+				<string>/System/Library/Automator/Run Shell Script.action</string>
+				<key>ActionName</key>
+				<string>Run Shell Script</string>
+				<key>ActionParameters</key>
+				<dict>
+					<key>COMMAND_STRING</key>
+					<string>def require_commands(cmds)
+  missing = cmds.filter do |cmd|
+    `which #{cmd}`
+    !$?.success?
+  end
+  return if missing.empty?
+
+  abort "This computer is missing the following commands required to run this software: #{missing.join(', ')}"
+end
+
+# Add homebrew to the PATH
+ENV['PATH'] = "#{ENV['PATH']}:/opt/homebrew/bin"
+
+require_commands(%w[ffmpeg ffprobe])
+
+def file_picker(title)
+  out = `osascript -e 'choose file with prompt "#{title}"' 2&gt;&amp;1`
+  return nil if $?.exitstatus != 0
+
+  out = out.gsub(/^alias Macintosh HD:(.*)$/, '/\1')
+  out = out.gsub(/:/, '/')
+  out.gsub(/[\n\r]/, '')
+end
+
+def input_dialog(text, default_answer)
+  out = `osascript -e 'display dialog "#{text}" default answer "#{default_answer}"'`
+  return nil if $?.exitstatus != 0
+
+  out.gsub(/^.*text returned:(.*)$/, '\1')
+end
+
+def dialog(text)
+  `osascript -e 'display dialog "#{text}"'`
+  return nil if $?.exitstatus != 0
+
+  ''
+end
+
+#
+# Get input file
+#
+if ARGV.length &gt;= 1
+  input_file = ARGV[0]
+else
+  input_file = file_picker("Pick video file")
+  if input_file.nil?
+    exit(0)
+  end
+end
+
+#
+# Get target video size
+#
+target_size_mb = nil # in bits
+
+if ARGV.length &gt;= 2
+  target_size = Integer(ARGV[1])
+else
+  while target_size_mb.nil?
+    r = input_dialog('Enter target filesize (in megabytes)', '8')
+    return if r.nil?
+
+    begin
+      target_size_mb = Float(r)
+    rescue ArgumentError
+      r = dialog('Please enter a number')
+      return if r.nil?
+    end
+  end
+end
+
+target_size_bits = target_size_mb * 1000 * 1000 * 8  # convert to bits
+
+#
+# Calculate some values
+#
+
+def calculate_video_length(input_file)
+  out = `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "#{input_file}"`
+  abort('ffprobe failed!') unless $?.success?
+  Float(out).ceil
+end
+
+length = calculate_video_length(input_file)
+total_bitrate = target_size_bits / length
+audio_bitrate = 128 * 1000 # 128k bitrate
+video_bitrate = total_bitrate - audio_bitrate
+bufsize = target_size_bits / 20
+
+`osascript -e 'tell application "Terminal" to do script "ffmpeg -i \\"#{input_file}\\" -b:v #{video_bitrate} -bufsize:v #{bufsize} -b:a #{audio_bitrate} \\"#{input_file}-#{target_size_mb}MB.mp4\\""'`
+</string>
+					<key>CheckedForUserDefaultShell</key>
+					<true/>
+					<key>inputMethod</key>
+					<integer>1</integer>
+					<key>shell</key>
+					<string>/usr/bin/ruby</string>
+					<key>source</key>
+					<string></string>
+				</dict>
+				<key>BundleIdentifier</key>
+				<string>com.apple.RunShellScript</string>
+				<key>CFBundleVersion</key>
+				<string>2.0.3</string>
+				<key>CanShowSelectedItemsWhenRun</key>
+				<false/>
+				<key>CanShowWhenRun</key>
+				<true/>
+				<key>Category</key>
+				<array>
+					<string>AMCategoryUtilities</string>
+				</array>
+				<key>Class Name</key>
+				<string>RunShellScriptAction</string>
+				<key>InputUUID</key>
+				<string>8D3170FA-F073-4E75-85EC-F912F8F0BCBC</string>
+				<key>Keywords</key>
+				<array>
+					<string>Shell</string>
+					<string>Script</string>
+					<string>Command</string>
+					<string>Run</string>
+					<string>Unix</string>
+				</array>
+				<key>OutputUUID</key>
+				<string>89613817-ED1F-434F-9CCD-1BD71687A56D</string>
+				<key>ShowWhenRun</key>
+				<false/>
+				<key>UUID</key>
+				<string>7B24ADA8-CC3B-4996-B009-B8BFA513F573</string>
+				<key>UnlocalizedApplications</key>
+				<array>
+					<string>Automator</string>
+				</array>
+				<key>arguments</key>
+				<dict>
+					<key>0</key>
+					<dict>
+						<key>default value</key>
+						<integer>0</integer>
+						<key>name</key>
+						<string>inputMethod</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>0</string>
+					</dict>
+					<key>1</key>
+					<dict>
+						<key>default value</key>
+						<false/>
+						<key>name</key>
+						<string>CheckedForUserDefaultShell</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>1</string>
+					</dict>
+					<key>2</key>
+					<dict>
+						<key>default value</key>
+						<string></string>
+						<key>name</key>
+						<string>source</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>2</string>
+					</dict>
+					<key>3</key>
+					<dict>
+						<key>default value</key>
+						<string></string>
+						<key>name</key>
+						<string>COMMAND_STRING</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>3</string>
+					</dict>
+					<key>4</key>
+					<dict>
+						<key>default value</key>
+						<string>/bin/sh</string>
+						<key>name</key>
+						<string>shell</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>4</string>
+					</dict>
+				</dict>
+				<key>isViewVisible</key>
+				<integer>1</integer>
+				<key>location</key>
+				<string>681.500000:728.000000</string>
+				<key>nibPath</key>
+				<string>/System/Library/Automator/Run Shell Script.action/Contents/Resources/Base.lproj/main.nib</string>
+			</dict>
+			<key>isViewVisible</key>
+			<integer>1</integer>
+		</dict>
+	</array>
+	<key>connectors</key>
+	<dict/>
+	<key>variables</key>
+	<array>
+		<dict>
+			<key>UUID</key>
+			<string>111BDC16-531B-4C9B-88A1-04C3051592E5</string>
+			<key>identifier</key>
+			<string>com.apple.Automator.Variable.Storage</string>
+			<key>name</key>
+			<string>InputFile</string>
+		</dict>
+		<dict>
+			<key>UUID</key>
+			<string>7E6A5A53-26BF-4C2D-A8C3-3E8FCA5AF8E9</string>
+			<key>identifier</key>
+			<string>com.apple.Automator.Variable.Storage</string>
+			<key>name</key>
+			<string>TargetSize</string>
+		</dict>
+		<dict>
+			<key>UUID</key>
+			<string>2F5FC132-3CDB-4DFD-B8E7-682397C38EFB</string>
+			<key>identifier</key>
+			<string>com.apple.Automator.Variable.Storage</string>
+			<key>name</key>
+			<string>TargetSizeBits</string>
+		</dict>
+		<dict>
+			<key>UUID</key>
+			<string>B2381A1B-1B91-467D-8BA9-14E427F72E96</string>
+			<key>identifier</key>
+			<string>com.apple.Automator.Variable.Storage</string>
+			<key>name</key>
+			<string>InputLength</string>
+		</dict>
+		<dict>
+			<key>UUID</key>
+			<string>865BB377-6558-4ADC-A96C-A7958C6B7979</string>
+			<key>identifier</key>
+			<string>com.apple.Automator.Variable.Storage</string>
+			<key>name</key>
+			<string>Storage</string>
+		</dict>
+	</array>
+	<key>workflowMetaData</key>
+	<dict>
+		<key>applicationBundleIDsByPath</key>
+		<dict/>
+		<key>applicationPaths</key>
+		<array/>
+		<key>inputTypeIdentifier</key>
+		<string>com.apple.Automator.fileSystemObject</string>
+		<key>outputTypeIdentifier</key>
+		<string>com.apple.Automator.nothing</string>
+		<key>presentationMode</key>
+		<integer>15</integer>
+		<key>processesInput</key>
+		<false/>
+		<key>serviceInputTypeIdentifier</key>
+		<string>com.apple.Automator.fileSystemObject</string>
+		<key>serviceOutputTypeIdentifier</key>
+		<string>com.apple.Automator.nothing</string>
+		<key>serviceProcessesInput</key>
+		<false/>
+		<key>systemImageName</key>
+		<string>NSActionTemplate</string>
+		<key>useAutomaticInputType</key>
+		<false/>
+		<key>workflowTypeIdentifier</key>
+		<string>com.apple.Automator.servicesMenu</string>
+	</dict>
+</dict>
+</plist>
