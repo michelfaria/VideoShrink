@@ -18,16 +18,16 @@ See [DISCLAIMER](#disclaimer).
   - [Windows](#windows)
   - [macOS](#macos)
 - [DISCLAIMER](#disclaimer)
-<br>
-<br>
+
+
 
 # Installing ffmpeg
 
 This installation guide is written for folks who are not familiar with the command-line environment and environment variables. You may skip these instructions if you are familiar with those.
 
 Before you can use these scripts, you will need to install **ffmpeg** - a suite of command-line tools for video and audio processing. If you know you already have ffmpeg installed, you do not need to install it again and may skip this installation step. If you're not sure if you've installed ffmpeg before, it should be safe to follow this installation guide anyhow.
-<br>
-<br>
+
+
 
 ## ffmpeg: Windows
 ### Installing ffmpeg on Windows with Chocolatey (easiest)
@@ -41,12 +41,12 @@ Before you can use these scripts, you will need to install **ffmpeg** - a suite 
     If you don't see any errors in the installation output, Chocolatey should now be installed. 
 
 2. **Install ffmpeg:** In a PowerShell window with Administrative Privileges, type (or copy and paste) the command `choco install ffmpeg -y` and hit **Enter**. If there are no errors, ffmpeg is now installed.
-<br>
-<br>
+
+
 
 ### Installing ffmpeg on Windows manually (harder)
-<br>
-<br>
+
+
 
 If you cannot (or don't want to) install Chocolatey, you may also install ffmpeg manually. Do note that ffmpeg does not come with an installer, so we can only install it manually. It is very easy to mess up this installation — follow these instructions down to the letter and double-check your spellings.
 
@@ -66,7 +66,7 @@ If you cannot (or don't want to) install Chocolatey, you may also install ffmpeg
 
     If ffmpeg was installed **incorrectly**, you will see a window that says "Windows cannot find 'ffmpeg'. Make sure you typed the name correctly, and then try again." Start over from step 1 and make sure you didn't miss anything. If you haven't already, consider using the Chocolatey installation method.
 
-<br>
+
 
 ## ffmpeg: macOS
 ### Installing ffmpeg on macOS with Homebrew
