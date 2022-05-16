@@ -59,7 +59,9 @@
 				<key>ActionParameters</key>
 				<dict>
 					<key>COMMAND_STRING</key>
-					<string>def require_commands(cmds)
+					<string># VideoShrink 1.0 - macOS Edition
+
+def require_commands(cmds)
   missing = cmds.filter do |cmd|
     `which #{cmd}`
     !$?.success?
@@ -264,7 +266,7 @@ bufsize = target_size_bits / 20
 				<key>isViewVisible</key>
 				<integer>1</integer>
 				<key>location</key>
-				<string>681.500000:728.000000</string>
+				<string>673.000000:381.000000</string>
 				<key>nibPath</key>
 				<string>/System/Library/Automator/Run Shell Script.action/Contents/Resources/Base.lproj/main.nib</string>
 			</dict>
@@ -324,7 +326,7 @@ bufsize = target_size_bits / 20
 		<key>applicationPaths</key>
 		<array/>
 		<key>inputTypeIdentifier</key>
-		<string>com.apple.Automator.fileSystemObject</string>
+		<string>com.apple.Automator.fileSystemObject.movie</string>
 		<key>outputTypeIdentifier</key>
 		<string>com.apple.Automator.nothing</string>
 		<key>presentationMode</key>
@@ -332,7 +334,7 @@ bufsize = target_size_bits / 20
 		<key>processesInput</key>
 		<false/>
 		<key>serviceInputTypeIdentifier</key>
-		<string>com.apple.Automator.fileSystemObject</string>
+		<string>com.apple.Automator.fileSystemObject.movie</string>
 		<key>serviceOutputTypeIdentifier</key>
 		<string>com.apple.Automator.nothing</string>
 		<key>serviceProcessesInput</key>
